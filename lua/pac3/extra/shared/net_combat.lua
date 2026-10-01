@@ -2759,6 +2759,8 @@ if CLIENT then
 	CreateConVar("pac_client_force_consent", "0", {FCVAR_ARCHIVE}, "Whether you want to consent to pac3 physics forces")
 	CreateConVar("pac_client_hitscan_consent", "0", {FCVAR_ARCHIVE}, "Whether you want to consent to receiving damage by other players in PAC3 with the hitscan part.")
 
+	CreateConVar("pac_client_consent_force_all", "1", {FCVAR_ARCHIVE}, "ASC COMMAND: this will force all consents on whether or not you have them set to 0 or 1 this WILL NOT reset your consent settings.")
+
 	function pac.CountNetMessage()
 		local ply = LocalPlayer()
 
@@ -2796,11 +2798,23 @@ if CLIENT then
 	local function SendConsents()
 		net.Start("pac_signal_player_combat_consent")
 		net.WriteUInt(GetConVar("pac_client_npc_exclusion_consent"):GetInt(),2)
-		net.WriteBool(GetConVar("pac_client_grab_consent"):GetBool())
-		net.WriteBool(GetConVar("pac_client_damage_zone_consent"):GetBool())
-		net.WriteBool(GetConVar("pac_client_lock_camera_consent"):GetBool())
-		net.WriteBool(GetConVar("pac_client_force_consent"):GetBool())
-		net.WriteBool(GetConVar("pac_client_hitscan_consent"):GetBool())
+		if GetConVar("pac_client_consent_force_all"):GetBool() == true then
+			print("pac_client_consent_force_all is 1, ignoring client consents.")
+
+			net.WriteBool(true)
+			net.WriteBool(true)
+			net.WriteBool(true)
+			net.WriteBool(true)
+			net.WriteBool(true)
+		else
+			print("pac_client_consent_force_all is 0, following client consents.")
+
+			net.WriteBool(GetConVar("pac_client_grab_consent"):GetBool())
+			net.WriteBool(GetConVar("pac_client_damage_zone_consent"):GetBool())
+			net.WriteBool(GetConVar("pac_client_lock_camera_consent"):GetBool())
+			net.WriteBool(GetConVar("pac_client_force_consent"):GetBool())
+			net.WriteBool(GetConVar("pac_client_hitscan_consent"):GetBool())
+		end
 		net.SendToServer()
 	end
 
@@ -2836,7 +2850,7 @@ if CLIENT then
 		pac.Blocked_Combat_Parts = net.ReadTable()
 	end)
 
-	local consent_cvars = {"pac_client_npc_exclusion_consent", "pac_client_grab_consent", "pac_client_lock_camera_consent", "pac_client_damage_zone_consent", "pac_client_force_consent", "pac_client_hitscan_consent"}
+	local consent_cvars = {"pac_client_npc_exclusion_consent", "pac_client_grab_consent", "pac_client_lock_camera_consent", "pac_client_damage_zone_consent", "pac_client_force_consent", "pac_client_hitscan_consent","pac_client_consent_force_all"}
 	for _,cmd in ipairs(consent_cvars) do
 		cvars.AddChangeCallback(cmd, SendConsents)
 	end
