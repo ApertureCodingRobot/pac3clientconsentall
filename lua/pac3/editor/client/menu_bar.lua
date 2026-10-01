@@ -334,6 +334,8 @@ local function populate_options(menu)
 	npc_pref:SetImage("icon16/group.png")
 	npc_pref:SetTooltip("\"Friendliness\" is based on an NPC's Disposition toward you: Error&Hate, Fear&Neutral, Like")
 
+	combat_consents:AddCVar(L"(OVERRIDE) consent to all", "pac_client_consent_force_all", "1", "0"):SetTooltip("This will override the consent settings without changing their values")
+	
 	combat_consents:AddCVar(L"damage_zone part (area damage)", "pac_client_damage_zone_consent", "1", "0")
 	combat_consents:AddCVar(L"hitscan part (bullets)", "pac_client_hitscan_consent", "1", "0")
 	combat_consents:AddCVar(L"force part (physics forces)", "pac_client_force_consent", "1", "0")
